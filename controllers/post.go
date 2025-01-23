@@ -6,13 +6,12 @@ import (
 	"forum/models"
 	"log"
 	"net/http"
-	"strconv" // Import strconv for string to int conversion
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
 
-// CreatePost функция для создания нового поста
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	tokenString := r.Header.Get("Authorization")
 	if tokenString == "" {
@@ -21,7 +20,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims, err := validateToken(tokenString) // Use validateToken function
+	claims, err := validateToken(tokenString)
 	if err != nil {
 		log.Printf("Invalid token: %v", err)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -32,7 +31,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		log.Printf("Invalid request payload: %v\n", err)
-		http.Error(w, "Invalid request payload", http.StatusBadRequest) // Simplified error message
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
@@ -47,7 +46,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	if err := config.DB.Create(&post).Error; err != nil {
 		log.Printf("Database create error: %s\n", err)
-		http.Error(w, "Failed to create post", http.StatusInternalServerError) // Simplified error message
+		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
 	}
 
@@ -55,7 +54,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 
-// findUserID вспомогательная функция для нахождения ID пользователя по его имени
 func findUserID(username string) uint {
 	var user models.User
 	config.DB.Where("username = ?", username).First(&user)
@@ -63,7 +61,6 @@ func findUserID(username string) uint {
 	return user.ID
 }
 
-// DeletePost функция для удаления поста
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	tokenString := r.Header.Get("Authorization")
 	if tokenString == "" {
@@ -80,7 +77,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	postID, err := strconv.Atoi(vars["id"]) // Convert string ID to integer
+	postID, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		log.Printf("Invalid post ID: %v", err)
 		http.Error(w, "Invalid post ID", http.StatusBadRequest)
@@ -113,7 +110,7 @@ func validateToken(tokenString string) (*jwt.StandardClaims, error) {
 	}
 
 	claims := &jwt.StandardClaims{}
-	secret := config.Cfg.JWT.Secret // Retrieve secret from configuration
+	secret := config.Cfg.JWT.Secret
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})

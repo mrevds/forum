@@ -7,7 +7,7 @@ import (
 
 	"forum/models"
 
-	"gopkg.in/yaml.v3" // Используем yaml.v3
+	"gopkg.in/yaml.v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -46,9 +46,9 @@ func LoadConfig(path string) error {
 }
 
 func ConnectDatabase() {
-	err := LoadConfig("config/config.yaml") // Загружаем конфиг
+	err := LoadConfig("config/config.yaml")
 	if err != nil {
-		log.Fatal(err) // Обрабатываем ошибку загрузки конфига
+		log.Fatal(err)
 	}
 
 	dsn := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%d sslmode=%s client_encoding=%s",
@@ -57,12 +57,12 @@ func ConnectDatabase() {
 	var errDb error
 	DB, errDb = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if errDb != nil {
-		panic(fmt.Sprintf("failed to connect database: %s", errDb)) // More informative error message
+		panic(fmt.Sprintf("failed to connect database: %s", errDb))
 	}
 
 	errDb = DB.AutoMigrate(&models.User{}, &models.Post{})
 	if errDb != nil {
-		panic(fmt.Sprintf("failed to migrate database: %s", errDb)) // More informative error message
+		panic(fmt.Sprintf("failed to migrate database: %s", errDb))
 	}
 
 	fmt.Println("Database connected")
