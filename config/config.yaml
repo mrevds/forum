@@ -1,0 +1,10 @@
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "12345678"
+  dbname: "forum"
+  sslmode: "disable"
+  client_encoding: "UTF8"
+jwt:
+  secret: "secret"
